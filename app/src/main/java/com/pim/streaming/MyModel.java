@@ -1,14 +1,28 @@
 package com.pim.streaming;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import androidx.annotation.NonNull;
 
 public class MyModel {
+    @SerializedName("titulo")
+    @Expose
     String titulo = "";
+    @SerializedName("descricao")
+    @Expose
     String descricao = "";
+    @SerializedName("nomeCriador")
+    @Expose
     String nomeCriador = "";
 
-    public MyModel(String titulo, String descricao, String nomeCriador) {
-        this.titulo = titulo;
-        this.descricao = descricao;
-        this.nomeCriador = nomeCriador;
+    @NonNull
+    @Override
+    public String toString() {
+        return "MyModel{" +
+                "titulo='" + titulo + '\'' +
+                ", descricao=" + descricao + '\'' +
+                ", nomeCriador=" + nomeCriador +
+                '}';
     }
 
     public String getTitulo() {

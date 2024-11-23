@@ -11,16 +11,24 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class ConteudosActivity extends AppCompatActivity {
     List<MyModel> myModelList;
     CustomAdapter customAdapter;
     RecyclerView recyclerView;
+    private ConteudoApiService conteudoApiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,24 +41,42 @@ public class ConteudosActivity extends AppCompatActivity {
             return insets;
         });
 
-        displayItems();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.100.8:3000")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        conteudoApiService = retrofit.create(ConteudoApiService.class);
+
+        getConteudos();
+    }
+
+    private void getConteudos() {
+        Log.d("API_CALL", "Iniciando a requisição para a API");
+        Call<List<MyModel>> call = conteudoApiService.getConteudos();
+
+        call.enqueue(new Callback<List<MyModel>>() {
+            @Override
+            public void onResponse(Call<List<MyModel>> call, Response<List<MyModel>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    myModelList = response.body();
+                    displayItems();
+                } else {
+                    Log.e("API_CALL", "Resposta da API não foi bem-sucedida");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<MyModel>> call, Throwable t) {
+                Log.e("API_CALL", "Erro na chamada da API: " + t.getMessage());
+            }
+        });
     }
 
     private void displayItems() {
         recyclerView = findViewById(R.id.recyclerMain);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-
-        myModelList = new ArrayList<>();
-
-        myModelList.add(new MyModel("Lord vinheteiro perdeu a senha dos BITCOIN", "Vamos falar sobre a perda da senha dos bitcoins do Lord Vinheteiro", "AncapSu"));
-        myModelList.add(new MyModel("Qual a melhor linguagem de programação?", "Eu fazia tudo em python", "Cortes do Ciência Sem Fim [OFICIAL]"));
-        myModelList.add(new MyModel("A fantástica fábrica das crianças coach", "", "mano deyvin"));
-        myModelList.add(new MyModel("ATENÇÃO! SAIBA DISSO ANTES DE VIR AO PARAGUAI", "Paraguai não é para qualquer um", "Porque o Paraguai?"));
-        myModelList.add(new MyModel("Downloading images from US Military Satellites", "Is this legal?", "saveitforparts"));
-        myModelList.add(new MyModel("#93 O ISO Mitos e Verdades !!!", "", "Câmera Velha"));
-        myModelList.add(new MyModel("Passeio a Kherson no segundo aniversário da libertação da cidade", "Estou aqui na Ucrânia, na cidade de Kherson", "Diários da Quarentena"));
-        myModelList.add(new MyModel("15 de Nov: Forças Ucranianas avançam e retomam Terny!", "", "Boletim d aUcrânia"));
 
         customAdapter = new CustomAdapter(this, myModelList);
 

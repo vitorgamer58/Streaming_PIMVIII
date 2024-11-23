@@ -1,5 +1,6 @@
 package com.pim.streaming;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,14 +29,33 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
-        holder.textTitulo.setText(list.get(position).getTitulo());
+        String titulo = list.get(holder.getAdapterPosition()).getTitulo();
+        String criador = String.format("Criador: %s", list.get(position).getNomeCriador());
         String descricao = list.get(position).getDescricao();
+
+        holder.textTitulo.setText(titulo);
 
         if(descricao == null || descricao.isEmpty()) {
             holder.textDescricao.setVisibility(TextView.GONE);
         }
-        holder.textDescricao.setText(list.get(position).getDescricao());
-        holder.textCriador.setText(String.format("Criador: %s", list.get(position).getNomeCriador()));
+        holder.textDescricao.setText(truncateString(descricao, 50));
+        holder.textCriador.setText(criador);
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ConteudoActivity.class);
+            intent.putExtra("titulo", titulo);
+            intent.putExtra("descricao", descricao);
+            intent.putExtra("criador", criador);
+
+            context.startActivity(intent);
+        });
+    }
+
+    private String truncateString(String text, int maxLength) {
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "...";
     }
 
     @Override

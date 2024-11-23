@@ -26,6 +26,10 @@
             android:name=".ConteudosActivity"
             android:exported="true">
         </activity>
+        <activity
+            android:name=".ConteudoActivity"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>
